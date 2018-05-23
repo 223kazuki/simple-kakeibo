@@ -1,0 +1,35 @@
+{[:duct.migrator.ragtime/sql :simple-kakeibo.migration/ddl-2018050701-create-payment]
+ {:up ["CREATE TABLE payment (
+          id int PRIMARY KEY,
+          name varchar not null,
+          due_date date not null)"
+       "CREATE SEQUENCE payment_id"]
+  :down ["DROP TABLE payment"
+         "DROP SEQUENCE payment_id"]}
+ [:duct.migrator.ragtime/sql :simple-kakeibo.migration/ddl-2018050702-create-wallet]
+ {:up ["CREATE TABLE wallet (
+          id int PRIMARY KEY,
+          name varchar not null)"
+       "CREATE SEQUENCE wallet_id"]
+  :down ["DROP TABLE wallet"
+         "DROP SEQUENCE wallet_id"]}
+ [:duct.migrator.ragtime/sql :simple-kakeibo.migration/ddl-2018050703-create-payment-event]
+ {:up ["CREATE TABLE payment_event (
+          id int PRIMARY KEY,
+          type varchar not null,
+          event_date date not null,
+          charge int not null,
+          payment_id int REFERENCES payment)"
+       "CREATE SEQUENCE payment_event_id"]
+  :down ["DROP TABLE payment_event"
+         "DROP SEQUENCE payment_event_id"]}
+ [:duct.migrator.ragtime/sql :simple-kakeibo.migration/ddl-2018050704-create-wallet-event]
+ {:up ["CREATE TABLE wallet_event (
+          id int PRIMARY KEY,
+          type varchar not null,
+          event_date date not null,
+          charge int not null,
+          wallet_id int REFERENCES wallet)"
+       "CREATE SEQUENCE wallet_event_id"]
+  :down ["DROP TABLE wallet_event"
+         "DROP SEQUENCE wallet_event_id"]}}

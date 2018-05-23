@@ -1,0 +1,53 @@
+{:duct.core/project-ns  simple-kakeibo
+ :duct.core/environment :production
+ :duct.module/logging {}
+ :duct.module.web/api {}
+ :duct.middleware.web/defaults
+ {:cookies true
+  :session {:flash true
+            :cookie-attrs {:http-only true, :same-site :strict}}
+  :static {:resources ["simple_kakeibo/public"]}}
+ :duct.module/cljs {:main simple-kakeibo.client}
+ :duct.module/sql {}
+
+ :duct.module/ataraxy
+ {"/api" ^:wrap-auth
+  {[:get "/payments"] [:api/payments]
+   [:get "/wallets"] [:api/wallets]
+   [:post "/payments" {params :body-params}] [:api.payments/create params]
+   [:post "/wallets" {params :body-params}] [:api.wallets/create params]
+   [:put "/payments/" id {params :body-params}] [:api.payments/update id params]
+   [:post "/payments/" id "/settle"] [:api.payments/settle id]
+   [:post "/payments/" id "/unsettle"] [:api.payments/unsettle id]
+   [:put "/wallets/" id {params :body-params}] [:api.wallets/update id params]
+   [:delete "/payments/" id] [:api.payments/delete id]
+   [:delete "/wallets/" id] [:api.wallets/delete id]}
+  [:post "/login" {params :body-params}] [:api/login params]
+  [:get  "/logout"] [:logout]
+  [:get] [:index]}
+
+ :simple-kakeibo.middleware/auth-backend {}
+ :simple-kakeibo.middleware/wrap-auth
+ {:auth-backend #ig/ref :simple-kakeibo.middleware/auth-backend}
+
+ :simple-kakeibo.handler.api/login {:login-email #duct/env ["LOGIN_EMAIL"]
+                                    :login-password #duct/env ["LOGIN_PASSWORD"]}
+ :simple-kakeibo.handler/logout {}
+ :simple-kakeibo.handler/index {}
+ :simple-kakeibo.handler.api/payments {:db #ig/ref :duct.database/sql}
+ :simple-kakeibo.handler.api/wallets {:db #ig/ref :duct.database/sql}
+ :simple-kakeibo.handler.api.payments/create {:db #ig/ref :duct.database/sql}
+ :simple-kakeibo.handler.api.wallets/create {:db #ig/ref :duct.database/sql}
+ :simple-kakeibo.handler.api.payments/update {:db #ig/ref :duct.database/sql}
+ :simple-kakeibo.handler.api.payments/settle {:db #ig/ref :duct.database/sql}
+ :simple-kakeibo.handler.api.payments/unsettle {:db #ig/ref :duct.database/sql}
+ :simple-kakeibo.handler.api.wallets/update {:db #ig/ref :duct.database/sql}
+ :simple-kakeibo.handler.api.payments/delete {:db #ig/ref :duct.database/sql}
+ :simple-kakeibo.handler.api.wallets/delete {:db #ig/ref :duct.database/sql}
+
+ :duct.core/include ["simple_kakeibo/migration"]
+ :duct.migrator/ragtime
+ {:migrations [#ig/ref :simple-kakeibo.migration/ddl-2018050701-create-payment
+               #ig/ref :simple-kakeibo.migration/ddl-2018050702-create-wallet
+               #ig/ref :simple-kakeibo.migration/ddl-2018050703-create-payment-event
+               #ig/ref :simple-kakeibo.migration/ddl-2018050704-create-wallet-event]}}

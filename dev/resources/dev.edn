@@ -1,0 +1,4 @@
+{:duct.core/environment :development
+ :duct.core/include ["simple_kakeibo/config"]
+ :duct.module/sql
+ {:database-url "jdbc:postgresql://localhost:5432/simple_kakeibo?user=postgres&password=password"}}
